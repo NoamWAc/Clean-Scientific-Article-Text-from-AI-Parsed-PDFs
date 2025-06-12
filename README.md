@@ -1,4 +1,4 @@
-# Extract-Scientific-Articles-from-PDFs
+# Extract Scientific Article Text from PDFs
 
 ## What does this project do?
 
