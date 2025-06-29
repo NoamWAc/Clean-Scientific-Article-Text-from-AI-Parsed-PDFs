@@ -14,16 +14,26 @@ def clean_markdown_for_tts(md_text):
             if i > cutoff_line:
                 md_text = '\n'.join(lines[:i]).rstrip()
                 break
+    
+    # 2. Remove numeric citations after punctuation, like ".40,42–44" or ").12,13"
+    md_text = re.sub(r'(?<=[\.\)])\s*\d+(?:[,\u2013-]\s*\d+)*', '', md_text)
 
+    # 3. Remove parenthetical or bracketed figure/table refs only
+    md_text = re.sub(
+        r'[\(\[]\s*(?:see\s+)?(?:Figure|Fig\.?|Table|Tab\.?)\s*S?\d+[a-zA-Z]?(?:[,\u2013\-–]\s*\d+[a-zA-Z]?)?\s*[\)\]]',
+        '',
+        md_text,
+        flags=re.IGNORECASE
+    )
+    
     # 2. Remove in-text references (superscript style, bracketed numbers, parenthetical references)
     md_text = re.sub(r'(?<=\w)\s*\^?\d+\b', '', md_text)  # e.g., text^1 or text 1
     md_text = re.sub(r'\[(\d+([-,]\s?\d+)*|(\d+,?\s?)+)\]', '', md_text) # e.g., [1], [1, 2], [1-3]
     md_text = re.sub(r'\((?:[A-Z][a-zA-Z]+(?:,? (?:&|and) [A-Z][a-zA-Z]+)*,? (?:et al\.,? )?\d{4}(?:; ?[A-Z][a-zA-Z]+,? \d{4})*)\)', '', md_text) # e.g., (Smith et al., 2020), (Smith, 2020; Johnson, 2019)
     md_text = re.sub(r'[^\S\r\n]{2,}', ' ', md_text)  # Replace only multiple spaces, not newlines
 
-    # 3. Remove figure/table references in the text body (e.g., (Figure 1c), [Table 2], etc.)
-    md_text = re.sub(r'\(?(Figure|Fig\.?|Table|Tab\.?)\s*\d+[a-zA-Z]?\)?', '', md_text, flags=re.IGNORECASE) # e.g., (Figure 1), [Table 2], Fig. 3a
-    md_text = re.sub(r'\[?(Figure|Fig\.?|Table|Tab\.?)\s*\d+[a-zA-Z]?\]?', '', md_text, flags=re.IGNORECASE) # e.g., [Figure 1], Fig. 2b
+    
+
 
     # 4. Remove images (markdown: ![alt](url))
     md_text = re.sub(r'!\[.*?\]\(.*?\)', '', md_text) # e.g., ![image](image_url)
