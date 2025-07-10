@@ -41,4 +41,6 @@ Copying text from scientific PDFs—especially AI-parsed ones—often results in
 
 ---
 
+_This project was done as part of the [Basic programming skills (Python)](https://github.com/Code-Maven/wis-python-course-2025-03) course._
+
 _The writing of this README.md file was ordered by me and outputted by ChatGPT, as was much of the code._
