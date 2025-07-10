@@ -50,7 +50,7 @@ def clean_markdown_for_tts(md_text):
         'superscript_unicode': lambda t: re.sub(r'[¹²³⁴⁵⁶⁷⁸⁹⁰]+', '', t),
         'after_period':  lambda t: re.sub(r'(?<!\d)\.(\(?\d+(?:[-–]\d+)?(?:,\d+(?:[-–]\d+)?)*\)?)\b', '', t),
         'after_comma':   lambda t: re.sub(r'(?<=\.)\(?\d+(?:[-–]\d+)?(?:,\d+(?:[-–]\d+)?)*\)?(?![\d\.])', '', t),
-        'period_or_comma': lambda t: re.sub(r'(?<=[\.,])\d+(?:[-–]\d+)?(?:,\d+(?:[-–]\d+)?)*\b(?!\.\d)', '', t),
+        'period_or_comma': lambda t: re.sub(r'(?<=[\.,])\d+(?:[-–]\d+)?(?:,\d+(?:[-–]\d+)?)*\b(?![\.\d}])', '', t),
         'numeric_bracket': lambda t: re.sub(r'\[\d+(?:[-–]\d+)?(?:,\s*\d+(?:[-–]\d+)?)*\]', '', t),
         'numeric_paren':   lambda t: re.sub(r'\(\d+(?:[-–]\d+)?(?:,\s*\d+(?:[-–]\d+)?)*\)', '', t),
         'author_date': lambda t: re.sub(r'\((?:[A-Z][a-zA-Z.\-]+(?:\s+(?:and|&)\s+[A-Z][a-zA-Z.\-]+)?(?:,\s*[A-Z][a-zA-Z.\-]+)*(?:\s+et\s+al\.)?),?\s*\d{4}[a-z]?\.?(?:\s*(?:;|,)\s*(?:[A-Z][a-zA-Z.\-]+(?:\s+(?:and|&)\s+[A-Z][a-zA-Z.\-]+)?(?:,\s*[A-Z][a-zA-Z.\-]+)*(?:\s+et\s+al\.)?),?\s*\d{4}[a-z]?\.?)*\)', '', t)
@@ -85,7 +85,7 @@ def guess_citation_style(md_text):
         # After punctuation (period) no space, no decimals
         'after_period': re.compile(r'(?<!\d)\.(\(?\d+(?:[-–]\d+)?(?:,\d+(?:[-–]\d+)?)*\)?)\b'),
         # After comma
-        'after_comma':   re.compile(r'(?<=,)\d+(?:[-–]\d+)?(?:,\d+(?:[-–]\d+)?)*\b(?!\.\d)'),
+        'after_comma':   re.compile(r'(?<=,)\d+(?:[-–]\d+)?(?:,\d+(?:[-–]\d+)?)*\b(?![\.\d}])'),
         'numeric_bracket': re.compile(r'\[\d+(?:[-–]\d+)?(?:,\s*\d+(?:[-–]\d+)?)*\]'),
         'numeric_paren':   re.compile(r'\(\d+(?:[-–]\d+)?(?:,\s*\d+(?:[-–]\d+)?)*\)'),
         'author_date': re.compile(r'\([A-Za-z].*?\d{4}[a-z]?(?:;.*?)*\)')
