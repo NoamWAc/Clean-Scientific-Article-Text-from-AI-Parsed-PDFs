@@ -1,6 +1,7 @@
 import re
 import sys
 import os
+from pylatexenc.latex2text import LatexNodes2Text
 
 def clean_markdown_for_tts(md_text):
 
@@ -33,14 +34,6 @@ def clean_markdown_for_tts(md_text):
             cleaned_lines.append(line)
     md_text = '\n'.join(cleaned_lines)
 
-    # Join hyphenated words that were split across lines or with a space (common in PDF-to-text conversions)
-    md_text = re.sub(r'(?<=\w)-( |\n)(?=\w)', lambda m: '-' if m.group(1) == ' ' else '', md_text)
-
-    # Clean spacing
-    md_text = re.sub(r'[^\S\r\n]{2,}', ' ', md_text)  # multiple spaces → one (except newlines)
-    md_text = re.sub(r'\n{3,}', '\n\n', md_text)      # multiple blank lines → 2
-    md_text = md_text.strip()
-
     style = guess_citation_style(md_text)
     print(style) # debug
     # map each style to its removal regex or function
@@ -57,6 +50,24 @@ def clean_markdown_for_tts(md_text):
     }
     citation_remover = removals.get(style, lambda t: t)
     md_text = citation_remover(md_text)    
+    
+    # Makes LaTeX snippets more tolerable in TTS. Can cause loss of meaning.
+    md_text = clean_math_blocks(md_text)
+
+    # Fix dash‑digit gaps, catching all dash variants and all digit lengths
+    DASH = r'[-\u2010\u2011\u2012\u2013\u2014\u2212]'
+    md_text = re.sub(rf'{DASH}\s+(\d+)', lambda m: f'-{m.group(1)}', md_text)
+
+    # Remove any whitespace before punctuation
+    md_text = re.sub(r'\s+([.,;:!?])', r'\1', md_text)
+
+    # Join hyphenated words that were split across lines or with a space (common in PDF-to-text conversions)
+    md_text = re.sub(r'(\w)-\s+(\w)', r'\1\2', md_text)
+
+      # Clean spacing
+    md_text = re.sub(r'[^\S\r\n]{2,}', ' ', md_text)  # multiple spaces → one (except newlines)
+    md_text = re.sub(r'\n{3,}', '\n\n', md_text)      # multiple blank lines → 2
+    md_text = md_text.strip()
     
     return md_text
 
@@ -112,6 +123,17 @@ def guess_citation_style(md_text):
     
     return 'undetermined'
 
+
+def clean_math_blocks(text):
+    # Finds anything between single $ … $
+    def repl(m):
+        inner = m.group(1)
+        # Convert LaTeX to Unicode/plain text
+        unicode_text = LatexNodes2Text().latex_to_text(inner)
+        # If conversion is empty or too weird, fallback to a placeholder
+        return unicode_text.strip() or '[math]'
+    # Note: this only handles single-$…$ blocks
+    return re.sub(r'\$(.+?)\$', repl, text, flags=re.DOTALL)
 
 if __name__ == "__main__":
     
