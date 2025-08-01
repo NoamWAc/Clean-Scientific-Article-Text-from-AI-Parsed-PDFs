@@ -13,7 +13,7 @@ The result isn’t perfect—there may still be some extra material before or af
 
 ---
 
-### Requirements
+## Requirements
 
 * `pylatexenc` library:
 
@@ -39,7 +39,7 @@ The result isn’t perfect—there may still be some extra material before or af
 
 ---
 
-### Usage
+## Usage
 
 ```bash
 python edit_pdf_converter_output.py input.md [output.md]
